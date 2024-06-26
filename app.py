@@ -1,8 +1,13 @@
 import asyncio
+import os
+
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
+from dotenv import find_dotenv, load_dotenv
 
-bot = Bot(token="6776498381:AAFZS7X39XVF67OJDweKDp4QWKE5ObD4md4")
+load_dotenv(find_dotenv())
+
+bot = Bot(token=os.getenv("TOKEN"))
 dp = Dispatcher()
 
 URL = f"https://api.telegram.org/bot123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11/getMe"
