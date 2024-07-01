@@ -3,6 +3,7 @@ import os
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import CommandStart
+from aiogram.enums import ParseMode
 
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
