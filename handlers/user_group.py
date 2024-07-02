@@ -8,7 +8,7 @@ user_group_router = Router()
 user_group_router.message.filter(ChatTypeFilter(['group', 'supergroup']))
 
 
-restricted_words = {"чёрт", "кабан", "чмо"}
+restricted_words = {"дурак", "кабан", "идиот"}
 
 
 def clean_text(text: str):
@@ -19,5 +19,5 @@ def clean_text(text: str):
 @user_group_router.message()
 async def cleaner(message: types.Message):
     if restricted_words.intersection(clean_text(message.text.lower()).split()):
-        await message.reply(f"{message.from_user.first_name}, ты сучка, как ты со мной разговариваешь?")
+        await message.reply(f"{message.from_user.first_name}, пожалуйста не выражайтесь")
         await message.delete()
