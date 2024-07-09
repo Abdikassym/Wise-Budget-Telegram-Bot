@@ -3,6 +3,9 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from database.models import Product
 from filters.chat_types import ChatTypeFilter, IsAdmin
 from kbds.reply import get_keyboard
 
@@ -57,7 +60,7 @@ class AddProduct(StatesGroup):
     }
 
 
-@admin_router.message(StateFilter(None) ,F.text == "Добавить товар")
+@admin_router.message(StateFilter(None), F.text == "Добавить товар")
 async def add_product(message: types.Message, state: FSMContext):
     await message.answer(
         "Введите название товара", reply_markup=types.ReplyKeyboardRemove()
@@ -131,10 +134,19 @@ async def add_name(message: types.Message, state: FSMContext):
 
 
 @admin_router.message(AddProduct.image, F.photo)
-async def add_image(message: types.Message, state: FSMContext):
+async def add_image(message: types.Message, state: FSMContext, session: AsyncSession):
     await state.update_data(image=message.photo[-1].file_id)
     await message.answer("Товар добавлен", reply_markup=ADMIN_KB)
     data = await state.get_data()
+
+    session.add(Product(
+        name=data['name'],
+        description=data['description'],
+        price=float(data['price']),
+        image=data['image']
+    ))
+    await session.commit()
+
     await message.answer(str(data))
     await state.clear()
 
