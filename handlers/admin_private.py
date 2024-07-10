@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from database.models import Product
+from database.orm_query import orm_add_product
 from filters.chat_types import ChatTypeFilter, IsAdmin
 from kbds.reply import get_keyboard
 
@@ -139,16 +139,17 @@ async def add_image(message: types.Message, state: FSMContext, session: AsyncSes
     await message.answer("Товар добавлен", reply_markup=ADMIN_KB)
     data = await state.get_data()
 
-    session.add(Product(
-        name=data['name'],
-        description=data['description'],
-        price=float(data['price']),
-        image=data['image']
-    ))
-    await session.commit()
+    try:
+        await orm_add_product(session, data)
+        await message.answer("Товар добавлен", reply_markup=ADMIN_KB)
 
-    await message.answer(str(data))
-    await state.clear()
+    except Exception as e:
+        await message.answer(
+            f"Ошибка: \n{str(e)}\nОбратитесь к создателю бота.", reply_markup=ADMIN_KB
+        )
+
+    finally:
+        await state.clear()
 
 
 @admin_router.message(AddProduct.image)
